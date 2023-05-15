@@ -1,11 +1,9 @@
 const express = require('express')
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const path = require('path')
-const axios = require('axios')
 const router = express.Router()
 
 
-
+// Without Stripe 3DS
 // router.post("/pay", async(req, res, next) => {
 //
 //     const q = req.body
@@ -61,7 +59,7 @@ const router = express.Router()
 // })
 
 
-router.post("/pay-secure", async(req, res, next) => {
+router.post("/pay-secure", async(req, res) => {
 
     const q = req.body
     console.log(q);
@@ -121,7 +119,7 @@ router.post("/pay-secure", async(req, res, next) => {
 })
 
 
-router.post('/confirm', async (req, res, next) => {
+router.post('/confirm', async (req, res) => {
 
     const pi = req.body;
     console.log(pi)
