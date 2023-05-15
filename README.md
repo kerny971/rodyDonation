@@ -1,0 +1,3 @@
+# rodyDonation
+
+Api NodeJs / ExpressJs pour recevoir des paiements en stripe ! Cette application est en cours de construction...
