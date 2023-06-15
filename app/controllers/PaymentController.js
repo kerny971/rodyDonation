@@ -62,7 +62,6 @@ const router = express.Router()
 router.post("/pay-secure", async(req, res) => {
 
     const q = req.body
-    console.log(q);
     let errorData = null
     let statusCode = 200;
 
@@ -98,7 +97,6 @@ router.post("/pay-secure", async(req, res) => {
         paymentIntents = await stripe.paymentIntents.confirm(paymentIntents.id, { return_url: process.env.STRIPE_RETURN_URL });
 
     } catch (error) {
-        console.log(error.raw)
         errorData = {
             msg: error.message,
             statusCode: error.statusCode
@@ -122,7 +120,6 @@ router.post("/pay-secure", async(req, res) => {
 router.post('/confirm', async (req, res) => {
 
     const pi = req.body;
-    console.log(pi)
     let paymentIntent = null;
     let errorData = null;
     let statusCode = 200;
@@ -130,8 +127,15 @@ router.post('/confirm', async (req, res) => {
 
     try {
         paymentIntent = await stripe.paymentIntents.retrieve(pi.id);
+        if (paymentIntent.last_payment_error) {
+            errorData = {
+                message: paymentIntent.last_payment_error.message,
+                statusCode: 401
+            }
+        }
         console.log(paymentIntent);
     } catch (e) {
+        console.log('error')
         console.log(e)
         errorData = {
             message: e.message,
