@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const ErrorStripeAPI = require('../functions/ErrorStripeAPI');
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const router = express.Router()
 
@@ -97,10 +98,8 @@ router.post("/pay-secure", async(req, res) => {
         paymentIntents = await stripe.paymentIntents.confirm(paymentIntents.id, { return_url: process.env.STRIPE_RETURN_URL });
 
     } catch (error) {
-        errorData = {
-            msg: error.message,
-            statusCode: error.statusCode
-        }
+        console.log(error)
+        errorData = new ErrorStripeAPI(error.raw).sendError();
     }
 
 
@@ -128,19 +127,14 @@ router.post('/confirm', async (req, res) => {
     try {
         paymentIntent = await stripe.paymentIntents.retrieve(pi.id);
         if (paymentIntent.last_payment_error) {
-            errorData = {
-                message: paymentIntent.last_payment_error.message,
-                statusCode: 401
-            }
+            errorData = new ErrorStripeAPI(paymentIntent.last_payment_error).sendError();
+            errorData.statusCode = errorData.statusCode ?? 401;
         }
         console.log(paymentIntent);
     } catch (e) {
         console.log('error')
         console.log(e)
-        errorData = {
-            message: e.message,
-            statusCode: e.statusCode
-        }
+        errorData = new ErrorStripeAPI(error).sendError();
     }
 
     if (errorData) {
